@@ -1,4 +1,4 @@
-import { Burger, Button, Flex, Group, Space, Text } from "@mantine/core";
+import { Burger, Button, Flex, Group, Text } from "@mantine/core";
 import { Menu, useMantineTheme } from "@mantine/core";
 import { IconInfoSquareRounded, IconMail } from "@tabler/icons";
 import { Link } from "react-router-dom";
@@ -9,14 +9,9 @@ function Navbar() {
   const theme = useMantineTheme();
 
   return (
-    <div>
-      <Group spacing="xs">
-        <Menu
-          transition="pop-top-right"
-          position="bottom-end"
-          width={150}
-          withinPortal
-        >
+    <Flex align="center" justify="space-between">
+      <Group>
+        <Menu transition="scale-y" position="bottom-end" my="xs" withinPortal>
           <Menu.Target>
             <Burger />
           </Menu.Target>
@@ -51,8 +46,8 @@ function Navbar() {
         </Menu>
         <Link to="/" style={{ textDecoration: "none" }}>
           <Text
-            my="xs"
             size="lg"
+            my="md"
             className="title"
             color="#000000"
             weight="bolder"
@@ -61,11 +56,11 @@ function Navbar() {
           </Text>
         </Link>
       </Group>
-      <Group position="right">
+      <Group position="right" spacing="sm">
         <Button>Login</Button>
         <Button>Register</Button>
       </Group>
-    </div>
+    </Flex>
   );
 }
 
