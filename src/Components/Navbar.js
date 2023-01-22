@@ -9,9 +9,9 @@ function Navbar() {
   const theme = useMantineTheme();
 
   return (
-    <Flex align="center" justify="space-between">
+    <Flex align="center" justify="space-between" mt="xs" mx="sm">
       <Group>
-        <Menu transition="scale-y" position="bottom-end" my="xs" withinPortal>
+        <Menu transition="scale-y" position="bottom-end" withinPortal>
           <Menu.Target>
             <Burger />
           </Menu.Target>
@@ -45,20 +45,18 @@ function Navbar() {
           </Menu.Dropdown>
         </Menu>
         <Link to="/" style={{ textDecoration: "none" }}>
-          <Text
-            size="lg"
-            my="md"
-            className="title"
-            color="#000000"
-            weight="bolder"
-          >
+          <Text size="lg" className="title" color="#000000" weight="bolder">
             Blog App
           </Text>
         </Link>
       </Group>
       <Group position="right" spacing="sm">
-        <Button>Login</Button>
-        <Button>Register</Button>
+        <Link to="/login">
+          <Button>Login</Button>
+        </Link>
+        <Link to="/signup">
+          <Button>Sign Up</Button>
+        </Link>
       </Group>
     </Flex>
   );
