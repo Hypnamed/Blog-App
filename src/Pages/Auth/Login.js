@@ -1,102 +1,76 @@
 import { useState } from "react";
-import { Formik } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, PasswordInput, Stack, TextInput, Title } from "@mantine/core";
-import * as Yup from "yup";
+import { useForm, zodResolver } from "@mantine/form";
+import { z } from "zod";
 
 import altogic from "../../API/Altogic";
-import { IconAt, IconBookmark, IconLock } from "@tabler/icons";
+import { useAuth } from "../../Contexts/AuthContext";
+import { IconAt, IconLock } from "@tabler/icons";
 
 function Login() {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const [error, setError] = useState(null);
-  const [show, setShow] = useState(false);
+  const { setUser, setSessions } = useAuth();
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    email: Yup.string().email("Email is invalid").required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
-    passwordConfirm: Yup.string()
-      .oneOf([Yup.ref("password")], "Passwords do not match")
-      .required("Required field."),
+  const schema = z.object({
+    email: z.string().email({ message: "Invalid email" }),
+    password: z
+      .string()
+      .min(8, { message: "Password should have at least 8 characters" }),
   });
 
-  async function handleSubmit(values, bag) {
-    const { name, email, password } = values;
-    const { errors, user } = await altogic.auth.signUpWithEmail(
+  const form = useForm({
+    validate: zodResolver(schema),
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    },
+  });
+
+  async function handleSubmit(values) {
+    const { email, password } = values;
+
+    const { errors, user, session } = await altogic.auth.signInWithEmail(
       email,
-      password,
-      {
-        name: name,
-        admin: false,
-      }
+      password
     );
-
     if (errors) return setError(errors);
+    setUser(user ?? null);
+    setSessions(session ?? null);
 
-    if (user.emailVerified === false) {
-      navigate("/verification");
-    } else {
-      navigate("/");
-    }
-    bag.resetForm();
+    navigate("/");
   }
+
   return (
-    <div>
-      <Formik
-        initialValues={{
-          name: "",
-          email: "",
-          password: "",
-          passwordConfirm: "",
-        }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          errors,
-          touched,
-          values,
-          isSubmitting,
-          isValid,
-        }) => (
-          <Stack align="center" my="xl" spacing="xl">
-            <Title>Login</Title>
-            <form onSubmit={handleSubmit}>
-              <TextInput
-                icon={<IconAt />}
-                placeholder="Your E-Mail"
-                value={values.email}
-                size="lg"
-                my="sm"
-                onChange={handleChange}
-                withAsterisk
-              />
-              <PasswordInput
-                icon={<IconLock />}
-                placeholder="Password"
-                value={values.password}
-                size="lg"
-                my="sm"
-                onChange={handleChange}
-                withAsterisk
-              />
-              <Stack>
-                <Button my="xl" size="lg">
-                  Login
-                </Button>
-              </Stack>
-            </form>
-          </Stack>
-        )}
-      </Formik>
-    </div>
+    <Stack align="center" my="xl" spacing="xl">
+      <Title className="title">Login</Title>
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        <TextInput
+          icon={<IconAt />}
+          size="lg"
+          my="sm"
+          placeholder="E-Mail"
+          {...form.getInputProps("email")}
+          withAsterisk
+        />
+        <PasswordInput
+          icon={<IconLock />}
+          size="lg"
+          my="sm"
+          placeholder="Password"
+          {...form.getInputProps("password")}
+          withAsterisk
+        />
+        <Stack>
+          <Button type="submit" size="lg" my="xl" className="title">
+            Submit
+          </Button>
+        </Stack>
+      </form>
+    </Stack>
   );
 }
 

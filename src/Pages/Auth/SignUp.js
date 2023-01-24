@@ -1,33 +1,46 @@
 import { useState } from "react";
-import { Formik } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Button,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import * as Yup from "yup";
+import { Button, PasswordInput, Stack, TextInput, Title } from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
+import { z } from "zod";
 
 import altogic from "../../API/Altogic";
 import { IconAt, IconBookmark, IconLock } from "@tabler/icons";
 
 function SignUp() {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const [error, setError] = useState(null);
-  const [show, setShow] = useState(false);
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    email: Yup.string().email("Email is invalid").required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
-    passwordConfirm: Yup.string()
-      .oneOf([Yup.ref("password")], "Passwords do not match")
-      .required("Required field."),
+  const schema = z
+    .object({
+      name: z
+        .string()
+        .min(2, { message: "Name should have at least 2 letters" }),
+      email: z.string().email({ message: "Invalid email" }),
+      password: z
+        .string()
+        .min(8, { message: "Password should have at least 8 characters" }),
+      passwordConfirm: z
+        .string()
+        .min(8, { message: "Password should have at least 8 characters" }),
+    })
+    .superRefine(({ passwordConfirm, password }, ctx) => {
+      if (passwordConfirm !== password) {
+        ctx.addIssue({
+          code: "custom",
+          message: "The passwords did not match",
+        });
+      }
+    });
+
+  const form = useForm({
+    validate: zodResolver(schema),
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    },
   });
 
   async function handleSubmit(values, bag) {
@@ -48,79 +61,50 @@ function SignUp() {
     } else {
       navigate("/");
     }
-    bag.resetForm();
   }
   return (
-    <div>
-      <Formik
-        initialValues={{
-          name: "",
-          email: "",
-          password: "",
-          passwordConfirm: "",
-        }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          errors,
-          touched,
-          values,
-          isSubmitting,
-          isValid,
-        }) => (
-          <Stack align="center" my="xl" spacing="xl">
-            <Title>Sign Up</Title>
-            <form onSubmit={handleSubmit}>
-              <TextInput
-                icon={<IconBookmark />}
-                placeholder="Your Name"
-                value={values.name}
-                size="lg"
-                my="sm"
-                onChange={handleChange}
-                withAsterisk
-              />
-              <TextInput
-                icon={<IconAt />}
-                placeholder="Your E-Mail"
-                value={values.email}
-                size="lg"
-                my="sm"
-                onChange={handleChange}
-                withAsterisk
-              />
-              <PasswordInput
-                icon={<IconLock />}
-                placeholder="Password"
-                value={values.password}
-                size="lg"
-                my="sm"
-                onChange={handleChange}
-                withAsterisk
-              />
-              <PasswordInput
-                icon={<IconLock />}
-                placeholder="Password Confirm"
-                value={values.passwordConfirm}
-                size="lg"
-                my="sm"
-                onChange={handleChange}
-                withAsterisk
-              />
-              <Stack>
-                <Button my="xl" size="lg">
-                  Sign Up
-                </Button>
-              </Stack>
-            </form>
-          </Stack>
-        )}
-      </Formik>
-    </div>
+    <Stack align="center" my="xl" spacing="xl">
+      <Title className="title">Sign Up</Title>
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        <TextInput
+          icon={<IconBookmark />}
+          size="lg"
+          my="sm"
+          placeholder="Name"
+          {...form.getInputProps("name")}
+          withAsterisk
+        />
+        <TextInput
+          icon={<IconAt />}
+          size="lg"
+          my="sm"
+          placeholder="E-Mail"
+          {...form.getInputProps("email")}
+          withAsterisk
+        />
+        <PasswordInput
+          icon={<IconLock />}
+          size="lg"
+          my="sm"
+          placeholder="Password"
+          {...form.getInputProps("password")}
+          withAsterisk
+        />
+        <PasswordInput
+          icon={<IconLock />}
+          size="lg"
+          my="sm"
+          placeholder="Confirm Password"
+          {...form.getInputProps("passwordConfirm")}
+          withAsterisk
+        />
+        <Stack>
+          <Button type="submit" size="lg" my="xl" className="title">
+            Submit
+          </Button>
+        </Stack>
+      </form>
+    </Stack>
   );
 }
 

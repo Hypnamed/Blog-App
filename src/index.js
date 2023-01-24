@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
+import { AuthProvider } from "./Contexts/AuthContext";
 
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
@@ -14,7 +15,9 @@ root.render(
   <React.Fragment>
     <BrowserRouter>
       <MantineProvider>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MantineProvider>
     </BrowserRouter>
   </React.Fragment>

@@ -8,6 +8,7 @@ import Login from './Pages/Auth/Login';
 import SignUp from './Pages/Auth/SignUp';
 import Contact from './Pages/Contact';
 import Homepage from './Pages/Homepage';
+import Verification from './Pages/Verification';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path='/contact' element={<Contact />}/>
         <Route path='/signup' element={<SignUp />}/>
         <Route path='/login' element={<Login />}/>
+        <Route path='/verification' element={<Verification />}/>
       </Routes>
     </div>
   );
