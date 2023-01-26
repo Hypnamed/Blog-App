@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import altogic from "../API/Altogic";
@@ -26,7 +27,7 @@ const AuthProvider = ({ children }) => {
 
     setUser(user ?? null);
     setSessions(sessions ?? null);
-  }, [isAuth, user, sessions]);
+  }, [isAuth, user]);
 
   const signOutCurrentSession = async () => {
     try {
@@ -34,7 +35,7 @@ const AuthProvider = ({ children }) => {
 
       if (resp.errors === null) {
         setIsAuth(false);
-        navigate("/signin");
+        navigate("/login");
       }
     } catch (error) {
       console.error(error);

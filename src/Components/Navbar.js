@@ -2,11 +2,13 @@ import { Burger, Button, Flex, Group, Text } from "@mantine/core";
 import { Menu, useMantineTheme } from "@mantine/core";
 import { IconInfoSquareRounded, IconMail } from "@tabler/icons";
 import { Link } from "react-router-dom";
+import { useAuth } from "../Contexts/AuthContext";
 
 import "../App.css";
 
 function Navbar() {
   const theme = useMantineTheme();
+  const { isAuth } = useAuth();
 
   return (
     <Flex align="center" justify="space-between" mt="xs" mx="sm">
@@ -50,14 +52,23 @@ function Navbar() {
           </Text>
         </Link>
       </Group>
-      <Group position="right" spacing="sm">
-        <Link to="/login">
-          <Button>Login</Button>
-        </Link>
-        <Link to="/signup">
-          <Button>Sign Up</Button>
-        </Link>
-      </Group>
+      {!isAuth && (
+        <Group position="right" spacing="sm">
+          <Link to="/login">
+            <Button>Login</Button>
+          </Link>
+          <Link to="/signup">
+            <Button>Sign Up</Button>
+          </Link>
+        </Group>
+      )}
+      {isAuth && (
+        <Group position="right" spacing="sm">
+          <Link to="/profile">
+            <Button>Profile</Button>
+          </Link>
+        </Group>
+      )}
     </Flex>
   );
 }
